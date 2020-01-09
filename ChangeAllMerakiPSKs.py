@@ -25,11 +25,9 @@ import csv
 csvinputfile = None
 thePSKs={}
 
-from meraki import meraki
+import meraki
+dashboard = meraki.DashboardAPI(config.meraki_api_key)
 
-# sample in case you want to obtain the orgs programmatically
-#myOrgs = meraki.myorgaccess(config.meraki_api_key, True)
-#print(myOrgs)
 
 #first the PSKs you want to use
 fieldnamesin = ['SSID', 'PSK']
@@ -45,7 +43,14 @@ if len(thePSKs)==0:
     sys.exit(1)
 
 #obtain all networks in the Org specified by the config variable
-myNetworks = meraki.getnetworklist(config.meraki_api_key, config.meraki_org_id, None, True)
+try:
+    myNetworks = dashboard.networks.getOrganizationNetworks(config.meraki_org_id)
+except meraki.APIError as e:
+    print(f'Meraki API error: {e}')
+    sys.exit(1)
+except Exception as e:
+    print(f'some other error: {e}')
+    sys.exit(1)
 
 #stop the script if the operator does not agree with the operation being previewed
 print("About to update the all the APs PSKs as follows for their corresponding SSID : " )
@@ -77,7 +82,7 @@ for theNetwork in myNetworks:
         continue
 
     #get the SSIDs
-    theSSIDList=meraki.getssids(config.meraki_api_key, theNetworkid, True)
+    theSSIDList=dashboard.ssids.getNetworkSsids(theNetworkid)
 
     theSSIDsToUpdate=[]
     for theSSID in theSSIDList:
@@ -90,15 +95,14 @@ for theNetwork in myNetworks:
 
     #add back the updated SSID
     for theUpdateSSID in theSSIDsToUpdate:
-        theResult=meraki.updatessid(config.meraki_api_key,
-                                    theNetworkid,
-                                    theUpdateSSID['number'],
-                                    theUpdateSSID['name'],
-                                    theUpdateSSID['enabled'],
-                                    theUpdateSSID['authMode'],
-                                    theUpdateSSID['encryptionMode'],
-                                    theUpdateSSID['psk'],
-                                    True)
+        theResult=dashboard.ssids.updateNetworkSsid(
+                                    networkId=theNetworkid,
+                                    number=theUpdateSSID['number'],
+                                    name=theUpdateSSID['name'],
+                                    enabled=theUpdateSSID['enabled'],
+                                    authMode=theUpdateSSID['authMode'],
+                                    encryptionMode=theUpdateSSID['encryptionMode'],
+                                    psk=theUpdateSSID['psk'])
         #print(theResult)
 
     #need to make sure we do not send more than 5 API calls per second for this org
