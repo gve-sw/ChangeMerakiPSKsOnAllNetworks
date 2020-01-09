@@ -11,7 +11,7 @@ It will then ask for confirmation from the operator of the script.
 Python 3.6 with the following modules installed: 
 
 1. requests
-2. meraki
+2. meraki (version .70 or later)
 3. csv
 
 
