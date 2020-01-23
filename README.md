@@ -2,6 +2,7 @@
 
 This is a simple Python script that takes a PSK.csv file as input to change the Pre-Shared Keys (PSK) for the specified
 SSIDs for all networks in an organization.
+You also need a networks.csv file if you would like the script to only operate on those network names. If you want all networks in the org, just leave that file empty.
 Before going off to make the changes, it will print out to console a summary of the SSIDs and PSKs and the list of all networks it will affect.
 It will then ask for confirmation from the operator of the script.
 
@@ -51,6 +52,17 @@ Example of content of the **PSK.csv** file you must create:
 TESTSSID1, thePSKtoUSE
 TESTSSID2, thePSKtoUSE
 ```
+
+Example of content of the **networks.csv** file you must create:
+
+``` 
+MainOfficeNetwork
+Mall1
+Mall2
+Store5
+```
+
+
 
 ## Running the code:
 

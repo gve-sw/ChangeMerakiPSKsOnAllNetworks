@@ -23,7 +23,9 @@ import requests
 import csv
 
 csvinputfile = None
+csvinputfile2 = None
 thePSKs={}
+theNetworksWhiteList=[]
 
 import meraki
 dashboard = meraki.DashboardAPI(config.meraki_api_key)
@@ -35,6 +37,13 @@ with open('PSK.csv', newline='') as csvinputfile:
     datareader = csv.DictReader(csvinputfile, fieldnames=fieldnamesin)
     for row in datareader:
         thePSKs[row['SSID']]=row['PSK']
+
+#now read in the list of networks, if any, to check against instead of all
+fieldnames2in = ['NETNAME']
+with open('networks.csv', newline='') as csvinputfile2:
+    datareader2 = csv.DictReader(csvinputfile2, fieldnames=fieldnames2in)
+    for row in datareader2:
+        theNetworksWhiteList.append(row['NETNAME'])
 
 
 #check at least one PSK to configure
@@ -60,6 +69,9 @@ for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
     theNetworkname = theNetwork["name"]
     print(theNetworkid, "  ",theNetworkname)
+if len(theNetworksWhiteList)>0:
+    print("Networks white list detected, will only check on these:")
+    print(theNetworksWhiteList)
 if not input("Procced? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
 
@@ -69,6 +81,12 @@ for theNetwork in myNetworks:
     if theNetwork["name"].startswith('z') or theNetwork["name"].endswith('switch-wifi') or theNetwork["name"].endswith('camera') or theNetwork["name"].endswith('systems manager'):
         print("Skipping network named: ",theNetwork["name"], " because it starts with z or ends with switch-wifi, camera or systems manager" )
         continue
+    if len(theNetworksWhiteList)>0:
+        if theNetwork["name"] not in theNetworksWhiteList:
+            print("Skipping network named: ", theNetwork["name"],
+                  " because it is not in the whitelist (clean out whitelist in networks.csv if you want to check all networks)")
+            continue
+
 
     print("Updating PSKs for Network ID: "+theNetworkid+" named: ",theNetwork["name"],"...")
     continueAnswer="y"
