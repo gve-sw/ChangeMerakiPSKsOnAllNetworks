@@ -1,10 +1,11 @@
 # Change Meraki MR Pre-Shared Key on all Networks
 
-This is a simple Python script that takes a PSK.csv file as input to change the Pre-Shared Keys (PSK) for the specified
-SSIDs for all networks in an organization.
-You also need a networks.csv file if you would like the script to only operate on those network names. If you want all networks in the org, just leave that file empty.
+This is a simple Python script that takes a PSK.csv file as input to change the Pre-Shared Keys (PSK) for the specified SSIDs for all networks in an organization.
+
 Before going off to make the changes, it will print out to console a summary of the SSIDs and PSKs and the list of all networks it will affect.
 It will then ask for confirmation from the operator of the script.
+
+If you would like the script to only operate on a sub-set of networks in your organization, please create a **networks.csv** file as specified below in the same directory as the python script.
 
 
 ## Dependencies and initial setup:
@@ -46,14 +47,14 @@ It is a comma separated file where each row should have the following format:
 SSID, PSK
 
 
-Example of content of the **PSK.csv** file you must create:
+Example of content of the **PSK.csv** file you must create in the same directory of the python script:
 
 ``` 
 TESTSSID1, thePSKtoUSE
 TESTSSID2, thePSKtoUSE
 ```
 
-Example of content of the **networks.csv** file you must create:
+Example of content of the **networks.csv** file you must create and place in the same directory as the python script if you want to limit the operation of the script to only the networks specified:
 
 ``` 
 MainOfficeNetwork
